@@ -1,39 +1,34 @@
-# Use an official Python runtime as the base image
-FROM python:3.8
+# Use an official Node.js and python runtime as the base image
+FROM node:14-alpine as react-build
+FROM python:3.8-alpine
 
-# Set the working directory
-WORKDIR /app
+# Create a working directory for the react app
+WORKDIR /app/client
+
+# Copy the package.json and package-lock.json
+COPY client/package*.json ./
+
+# Install the react dependencies
+RUN npm install
+
+# Copy the react source code
+COPY client/. .
+
+# Build the react app
+RUN npm run build
+
+# Create a working directory for the python app
+WORKDIR /app/server
 
 # Copy the requirements file
-COPY requirements.txt .
+COPY server/requirements.txt .
 
-# Install the dependencies
+# Install the python dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Copy the source code
-COPY . .
-
-# Expose the port for the app
-EXPOSE 8000
-
-# Define the command to run the app
-CMD ["python", "web-app.py"]
-
-# Use an official Node.js runtime as the base image
-FROM node:14
-
-# Set the working directory
-WORKDIR /app
-
-# Copy the package.json and package-lock.json
-COPY package*.json ./
-
-# Install the dependencies
-RUN npm install
-
-# Copy the source code
-COPY . .
+# Copy the python source code
+COPY server/. .
 
 # Expose the port for the app
 EXPOSE 3000
