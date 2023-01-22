@@ -1,7 +1,7 @@
-using DataFrames, Statistics
+using DataFrames, CSV, Statistics
 
-# load the dataset
-traffic_data = DataFrame(readtable("traffic_data.csv"))
+# extract the data
+traffic_data = CSV.read("traffic_data.csv")
 
 # handle missing values
 handle_missing!(traffic_data)
@@ -21,6 +21,9 @@ normalize!(traffic_data, Not([:traffic_congestion, :date, :time]))
 
 # select relevant features
 traffic_data = select(traffic_data, Not([:date, :time, :accidents]))
+
+# load the preprocessed data
+CSV.write("preprocessed_traffic_data.csv", traffic_data)
 
 # check the structure of the preprocessed dataset
 describe(traffic_data)
